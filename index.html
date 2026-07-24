@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoTask - Premium Planner</title>
+    <!-- Tailwind CSS v4 -->
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-0 sm:p-6 antialiased selection:bg-indigo-500 selection:text-white">
+
+    <!-- App Main Container -->
+    <div class="w-full max-w-md bg-slate-900 min-h-screen sm:min-h-[780px] sm:rounded-[32px] shadow-2xl shadow-indigo-950/40 flex flex-col justify-between relative overflow-hidden border border-slate-800/80">
+        
+        <!-- Header Section -->
+        <div class="p-6 pb-2">
+            <div class="flex justify-between items-center mb-6">
+                <!-- Branding & Logo -->
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-cyan-400 flex items-center justify-center text-white shadow-lg shadow-indigo-500/25 ring-1 ring-white/20">
+                        <i class="fa-solid fa-cube text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-extrabold tracking-tight text-white flex items-center gap-1.5">
+                            Rukuify Cnote<span class="text-[10px] bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 px-1.5 py-0.5 rounded-md font-semibold uppercase tracking-wider">PRO</span>
+                        </h1>
+                        <p id="currentDateText" class="text-xs font-medium text-slate-400 mt-0.5"></p>
+                    </div>
+                </div>
+
+                <!-- Notification Icon -->
+                <button onclick="requestNotificationPermission()" class="w-10 h-10 rounded-xl bg-slate-800/80 border border-slate-700/60 flex items-center justify-center text-slate-300 hover:text-white hover:bg-slate-800 transition-all cursor-pointer relative" title="Enable Notifications">
+                    <i class="fa-regular fa-bell text-base"></i>
+                    <span id="notifBadge" class="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full animate-ping hidden"></span>
+                </button>
+            </div>
+
+            <!-- Category Tabs Navigation -->
+            <div class="flex gap-2 overflow-x-auto pb-3 mb-2 no-scrollbar" id="categoryTabs"></div>
+        </div>
+
+        <!-- Task List Area -->
+        <div class="flex-1 px-6 overflow-y-auto space-y-3 pb-28 pt-2" id="taskList"></div>
+
+        <!-- Floating Action Button (FAB) -->
+        <div class="absolute bottom-6 right-6 z-10">
+            <button onclick="openModal('addTaskModal')" class="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white w-14 h-14 rounded-2xl flex items-center justify-center shadow-xl shadow-indigo-600/40 border border-indigo-400/30 transition-all hover:scale-105 active:scale-95 cursor-pointer">
+                <i class="fa-solid fa-plus text-xl"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Add Task Modal -->
+    <div id="addTaskModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+        <div class="w-full max-w-sm bg-slate-900 rounded-3xl p-6 shadow-2xl transition-all border border-slate-800">
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-indigo-400"></i> Create New Task
+                </h3>
+                <button onclick="closeModal('addTaskModal')" class="text-slate-400 hover:text-white transition-colors p-1">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            
+            <form id="taskForm" onsubmit="saveTask(event)" class="space-y-4">
+                <div>
+                    <input type="text" id="taskTitle" placeholder="Task Title (e.g. Claim Daily Airdrop)" required class="w-full bg-slate-800/60 border border-slate-700/80 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all">
+                </div>
+                
+                <div>
+                    <textarea id="taskDesc" rows="3" placeholder="Add details, link or instructions..." class="w-full bg-slate-800/60 border border-slate-700/80 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"></textarea>
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Category</label>
+                    <select id="taskCategory" class="w-full bg-slate-800/60 border border-slate-700/80 rounded-xl px-3 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 transition-all">
+                        <option value="Airdrop">🪂 Airdrop</option>
+                        <option value="Micro Job">⚡ Micro Job</option>
+                        <option value="Daily Task">🔥 Daily Task</option>
+                        <option value="Red pack">🎁 Red pack</option>
+                    </select>
+                </div>
+
+                <!-- Reminder Toggle -->
+                <div class="flex items-center justify-between p-3.5 bg-slate-800/40 rounded-xl border border-slate-800">
+                    <div class="flex items-center gap-2.5">
+                        <i class="fa-regular fa-bell text-indigo-400 text-sm"></i>
+                        <span class="text-sm font-medium text-slate-300">Set Reminder</span>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="reminderToggle" onchange="toggleReminderFields()" class="sr-only peer">
+                        <div class="w-10 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
+                    </label>
+                </div>
+
+                <!-- Reminder Options -->
+                <div id="reminderOptions" class="hidden space-y-3 pt-1">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 mb-1.5">Repeat</label>
+                            <select id="reminderType" onchange="toggleReminderType()" class="w-full bg-slate-800/60 border border-slate-700/80 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 transition-all">
+                                <option value="daily">Daily</option>
+                                <option value="specific">Specific Date</option>
+                            </select>
+                        </div>
+                        <div id="timeField">
+                            <label class="block text-xs font-semibold text-slate-400 mb-1.5">Time</label>
+                            <input type="time" id="taskTime" class="w-full bg-slate-800/60 border border-slate-700/80 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 transition-all">
+                        </div>
+                    </div>
+                    
+                    <div id="dateField" class="hidden">
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Select Date</label>
+                        <input type="date" id="taskDate" class="w-full bg-slate-800/60 border border-slate-700/80 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 transition-all">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 py-3.5 rounded-xl text-sm font-semibold text-white shadow-lg shadow-indigo-600/30 active:scale-[0.98] transition-all cursor-pointer">Save Task</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Task Details Modal -->
+    <div id="detailsModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+        <div class="w-full max-w-sm bg-slate-900 rounded-3xl p-6 shadow-2xl border border-slate-800">
+            <div class="flex justify-between items-center mb-4">
+                <span id="detailBadge" class="text-[11px] font-bold px-3 py-1 rounded-full border"></span>
+                <button onclick="closeModal('detailsModal')" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            <h3 id="detailTitle" class="text-lg font-bold text-white mb-2"></h3>
+            <div id="detailTime" class="text-xs text-indigo-400 font-medium mb-4 flex items-center gap-1.5 bg-indigo-500/10 p-2.5 rounded-xl border border-indigo-500/20"></div>
+            <div class="border-t border-slate-800 pt-4">
+                <p id="detailDesc" class="text-sm text-slate-300 leading-relaxed break-words"></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

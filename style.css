@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Hide scrollbar for clean look */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Custom scrollbar for task list */
+#taskList::-webkit-scrollbar {
+    width: 4px;
+}
+
+#taskList::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#taskList::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 10px;
+}
+
+#taskList::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
